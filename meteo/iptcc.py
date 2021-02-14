@@ -26,6 +26,7 @@ def download_data(ville="Paris"):
 def prepare_data(df):
     df = df[['2_metre_temperature', 'relative_humidity', 'forecast']].groupby(['forecast']).mean().reset_index()
     df["forecast"] = pd.to_datetime(df["forecast"])
+    df = df[(df.forecast.dt.hour >= 6) & (df.forecast.dt.hour <= 18) ]
     df = df.resample('D', on='forecast').mean().reset_index()
     print(df)
     return df
