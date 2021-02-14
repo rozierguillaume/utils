@@ -23,7 +23,9 @@ coord_villes = {
     "Limoges": [45.833619, 1.261105],
     "Rouen": [49.443232, 1.099971],
     "Clermont-Ferrand":[45.777222, 3.087025],
-    "Metz": [49.1193089, 6.1757156]
+    "Metz": [49.1193089, 6.1757156],
+    "Montpellier": [43.6, 3.8833],
+    "Nice": [43.7101728, 7.2619532]
     
 }
 
@@ -40,7 +42,7 @@ def calculer_iptcc(df):
     return IPTCC
 
 def download_data(ville="Paris"):
-    url ="https://public.opendatasoft.com/api/records/1.0/search/?dataset=arpege-05-sp1_sp2&q=&rows=-1&facet=forecast&geofilter.distance={}%2C{}%2C30000".format(coord_villes[ville][0], coord_villes[ville][1]) #"https://public.opendatasoft.com/api/records/1.0/search/?dataset=arome-0025-enriched&q=&rows=-1&sort=forecast&facet=commune&facet=code_commune&refine.commune={}".format(ville)
+    url ="https://public.opendatasoft.com/api/records/1.0/search/?dataset=arpege-05-sp1_sp2&q=&rows=-1&facet=forecast&geofilter.distance={}%2C{}%2C40000".format(coord_villes[ville][0], coord_villes[ville][1]) #"https://public.opendatasoft.com/api/records/1.0/search/?dataset=arome-0025-enriched&q=&rows=-1&sort=forecast&facet=commune&facet=code_commune&refine.commune={}".format(ville)
     data = requests.get(url)
     with open('data/input/{}.json'.format(ville), 'wb') as f:
         f.write(data.content)
