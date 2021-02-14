@@ -12,7 +12,10 @@ coord_villes = {
     "Bordeaux": [44.837789, -0.57918],
     "Strasbourg": [48.5734053, 7.7521113],
     "Lille": [50.633333, 3.066667],
-    "Brest": [48.390394, -4.486076]
+    "Brest": [48.390394, -4.486076],
+    "Marseille": [43.300000, 5.400000],
+    "Rennes": [48.117266, -1.6777926]
+    
 }
 
 def calculer_iptcc(df):
@@ -54,6 +57,7 @@ def iterate_villes():
     dict_data = {"villes": list(coord_villes.keys())}
     villes = coord_villes
     for ville in villes:
+        print(ville)
         download_data(ville=ville)
         df = import_data(ville=ville)
         df = prepare_data(df).dropna()
