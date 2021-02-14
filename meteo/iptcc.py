@@ -18,13 +18,16 @@ def calculer_iptcc(df):
     return IPTCC
 
 def download_data(ville="Paris"):
-    url = "https://public.opendatasoft.com/api/records/1.0/search/?dataset=arome-0025-enriched&q=&rows=-1&sort=forecast&facet=commune&facet=code_commune&refine.commune={}".format(ville)
+    url ="https://public.opendatasoft.com/api/records/1.0/search/?dataset=arpege-05-sp1_sp2&q=&rows=-1&facet=forecast&geofilter.distance=48.8566%2C2.35222%2C30000" #"https://public.opendatasoft.com/api/records/1.0/search/?dataset=arome-0025-enriched&q=&rows=-1&sort=forecast&facet=commune&facet=code_commune&refine.commune={}".format(ville)
     data = requests.get(url)
     with open('data/input/{}.json'.format(ville), 'wb') as f:
         f.write(data.content)
 
 def prepare_data(df):
-    df = df[['2_metre_temperature', 'relative_humidity', 'forecast']].groupby(['forecast']).mean()
+    df = df[['2_metre_temperature', 'relative_humidity', 'forecast']].groupby(['forecast']).mean().reset_index()
+    df["forecast"] = pd.to_datetime(df["forecast"])
+    df = df.resample('D', on='forecast').mean().reset_index()
+    print(df)
     return df
 
 def import_data(ville):
@@ -38,13 +41,13 @@ def export_json(dict_data):
 
 def iterate_villes():
     dict_data = {}
-    villes = ["Paris", "Grenoble"]
+    villes = ["Paris"]
     for ville in villes:
         download_data(ville=ville)
         df = import_data(ville=ville)
         df = prepare_data(df).dropna()
         df["iptcc"] = calculer_iptcc(df)
-        dict_data[ville] = {"forecast": df.index.tolist(),"temperature": df["2_metre_temperature"].round(1).tolist(), "humidite_relative": df.relative_humidity.round(1).tolist(), "iptcc": df.iptcc.round(1).tolist()}
+        dict_data[ville] = {"forecast": df["forecast"].astype(str).tolist(),"temperature": df["2_metre_temperature"].round(1).tolist(), "humidite_relative": df.relative_humidity.round(1).tolist(), "iptcc": df.iptcc.round(1).tolist()}
     print(dict_data)
     export_json(dict_data)
 
