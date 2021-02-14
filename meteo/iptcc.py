@@ -5,6 +5,15 @@ import math
 import requests
 import numpy as np
 
+coord_villes = {
+    "Paris": [48.8566, 2.35222],
+    "Lyon": [45.764043, 4.835659],
+    "Toulouse": [43.6043, 1.4437],
+    "Bordeaux": [44.837789, -0.57918],
+    "Strasbourg": [48.5734053, 7.7521113],
+    "Lille": [50.633333, 3.066667]
+}
+
 def calculer_iptcc(df):
     T = df["2_metre_temperature"].values
     RH = df.relative_humidity.values
@@ -18,7 +27,7 @@ def calculer_iptcc(df):
     return IPTCC
 
 def download_data(ville="Paris"):
-    url ="https://public.opendatasoft.com/api/records/1.0/search/?dataset=arpege-05-sp1_sp2&q=&rows=-1&facet=forecast&geofilter.distance=48.8566%2C2.35222%2C30000" #"https://public.opendatasoft.com/api/records/1.0/search/?dataset=arome-0025-enriched&q=&rows=-1&sort=forecast&facet=commune&facet=code_commune&refine.commune={}".format(ville)
+    url ="https://public.opendatasoft.com/api/records/1.0/search/?dataset=arpege-05-sp1_sp2&q=&rows=-1&facet=forecast&geofilter.distance={}%2C{}%2C30000".format(coord_villes[ville][0], coord_villes[ville][1]) #"https://public.opendatasoft.com/api/records/1.0/search/?dataset=arome-0025-enriched&q=&rows=-1&sort=forecast&facet=commune&facet=code_commune&refine.commune={}".format(ville)
     data = requests.get(url)
     with open('data/input/{}.json'.format(ville), 'wb') as f:
         f.write(data.content)
@@ -41,14 +50,17 @@ def export_json(dict_data):
         outfile.write(json.dumps(dict_data))
 
 def iterate_villes():
-    dict_data = {}
-    villes = ["Paris"]
+    dict_data = {"villes": list(coord_villes.keys())}
+    villes = coord_villes
     for ville in villes:
         download_data(ville=ville)
         df = import_data(ville=ville)
         df = prepare_data(df).dropna()
         df["iptcc"] = calculer_iptcc(df)
-        dict_data[ville] = {"forecast": df["forecast"].astype(str).tolist(),"temperature": df["2_metre_temperature"].round(1).tolist(), "humidite_relative": df.relative_humidity.round(1).tolist(), "iptcc": df.iptcc.round(1).tolist()}
+        dict_data[ville] = {"forecast": df["forecast"].astype(str).tolist(),"temperature": df["2_metre_temperature"].round(1).tolist(), 
+                            "humidite_relative": df.relative_humidity.round(1).tolist(), 
+                            "iptcc": df.iptcc.round(1).tolist(),
+                            "coordonnees": coord_villes[ville]}
     print(dict_data)
     export_json(dict_data)
 
