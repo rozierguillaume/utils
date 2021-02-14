@@ -32,6 +32,10 @@ def import_data(ville):
         data = json.load(f)
     return pd.DataFrame.from_dict([record['fields'] for record in data['records']])
 
+def export_json(dict_data):
+    with open("data/output/iptcc.json", "w") as outfile:
+        outfile.write(json.dumps(dict_data))
+
 def iterate_villes():
     dict_data = {}
     villes = ["Paris", "Grenoble"]
@@ -42,5 +46,6 @@ def iterate_villes():
         df["iptcc"] = calculer_iptcc(df)
         dict_data[ville] = {"forecast": df.index.tolist(),"temperature": df["2_metre_temperature"].round(1).tolist(), "humidite_relative": df.relative_humidity.round(1).tolist(), "iptcc": df.iptcc.round(1).tolist()}
     print(dict_data)
+    export_json(dict_data)
 
 iterate_villes()
