@@ -40,7 +40,8 @@ coord_villes = {
     "Vannes": [47.658236, -2.760847],
     "Caen": [49.183333, -0.350000],
     "Montélimar": [44.5667, 4.75],
-    "Annecy": [45.899247, 6.129384]
+    "Annecy": [45.899247, 6.129384],
+    "Brive-la-Gaillarde": [45.159555, 1.533937]
 }
 
 def calculer_iptcc(df):
